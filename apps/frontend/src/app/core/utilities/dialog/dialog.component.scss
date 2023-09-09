@@ -1,0 +1,169 @@
+@use 'breakpoints';
+
+pal-dialog {
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   width: 100%;
+}
+
+// dialog-container is class placed on div wrapping mat-dialog-container and comes from the panelClass attribute
+.dialog-container {
+   h2 {
+      flex: 1;
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 32px;
+      margin: 0;
+      padding-left: 0.5em;
+   }
+
+   .mdc-dialog__title {
+      display: flex;
+      padding: 0.5em;
+      align-items: center;
+      color: #363b4d;
+      border-bottom: 1px solid;
+      border-bottom-color: #d1d8e3;
+      letter-spacing: normal;
+      margin-top: 0;
+
+      @include breakpoints.mobile {
+         .context-articles {
+            display: none;
+         }
+      }
+   }
+
+   .mdc-dialog__title.mat-mdc-dialog-title-no-border {
+      border-bottom: none;
+   }
+
+   .dialog-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      .dialog-content-wrapper {
+         position: static;
+
+         .mat-mdc-dialog-content {
+            padding: 1em;
+            height: 100%;
+            div[dialog-content] {
+               height: 100%;
+               display: flex;
+               flex-direction: column;
+            }
+         }
+
+         .dialog-no-scroll-content {
+            height: 100%;
+            overflow-y: hidden;
+         }
+      }
+   }
+
+   .dialog-close-icon {
+      color: #8d99ae;
+   }
+
+   .mat-mdc-dialog-container {
+      padding-left: 0;
+      padding-right: 0;
+      padding-top: 24px;
+      padding-bottom: 24px;
+
+      .mat-mdc-dialog-content {
+         margin: 0;
+         padding: 0 2em 1.5em 2em;
+      }
+
+      .mat-mdc-dialog-content-no-heading {
+         padding-top: 1.33em !important;
+      }
+
+      .mat-mdc-dialog-actions {
+         margin-left: 0;
+         margin-right: 0;
+         padding: 8px;
+         min-height: unset;
+         display: flex;
+         flex-wrap: wrap;
+         justify-content: flex-end;
+
+         .action-override-wrapper {
+            width: 100%;
+         }
+
+         .action-override-wrapper:empty {
+            display: none;
+         }
+      }
+
+      @include breakpoints.tablet {
+         min-width: 400px;
+      }
+
+      @include breakpoints.mobile {
+         border-radius: 0;
+         max-width: none !important;
+         min-width: 0 !important;
+         padding-left: 0;
+         padding-right: 0;
+         padding-top: 0;
+         padding-bottom: 0;
+         width: 100%;
+
+         .dialog-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+
+            .dialog-content-wrapper {
+               flex: 1;
+               height: auto;
+               overflow-x: hidden;
+               overflow-y: auto;
+               padding: 10px;
+
+               .mat-mdc-dialog-content {
+                  max-height: none !important;
+                  padding: 1em 0;
+
+                  .dialog-no-scroll-content {
+                     height: 100%;
+                     overflow-y: hidden;
+                  }
+               }
+            }
+         }
+
+         .mat-mdc-dialog-content {
+            height: auto;
+            max-height: none !important;
+            padding: 0 10px;
+         }
+
+         .mat-mdc-dialog-actions.nowrap-btns {
+            flex-wrap: nowrap;
+
+            button {
+               overflow: hidden;
+               white-space: nowrap;
+               text-overflow: ellipsis;
+            }
+         }
+
+         .mdc-dialog__surface {
+            border-radius: 0;
+         }
+      }
+   }
+
+   @include breakpoints.mobile {
+      height: 100%;
+      max-width: none !important;
+      position: fixed !important;
+      width: 100%;
+   }
+}

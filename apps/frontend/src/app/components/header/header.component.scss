@@ -1,0 +1,34 @@
+@use 'breakpoints';
+@use 'themes';
+
+.mat-toolbar {
+   background-color: white;
+   border-bottom: 2px solid themes.$border;
+
+   @include breakpoints.mobile {
+      background-color: themes.$menu-brand;
+      border-bottom: none;
+   }
+}
+
+.container {
+   display: grid;
+   grid-template-columns: 395px 1fr;
+   grid-template-areas: 'logo avatar';
+   gap: 1rem;
+
+   @include breakpoints.mobile {
+      grid-template-columns: 200px 1fr;
+   }
+}
+
+.logo {
+   grid-area: logo;
+   display: flex;
+   align-items: space-between;
+}
+
+.avatar {
+   grid-area: avatar;
+   justify-self: end;
+}

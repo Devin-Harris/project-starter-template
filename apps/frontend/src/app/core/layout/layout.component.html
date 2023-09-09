@@ -1,0 +1,21 @@
+<div
+   class="grid-container"
+   [class.menu-expanded]="navbarStateService.$data().expanded"
+>
+   <div class="header">
+      <pal-header></pal-header>
+   </div>
+
+   <div class="menu">
+      <pal-site-menu></pal-site-menu>
+   </div>
+
+   <div class="content">
+      <div class="route">
+         <router-outlet></router-outlet>
+      </div>
+      <div class="footer">
+         <pal-footer></pal-footer>
+      </div>
+   </div>
+</div>

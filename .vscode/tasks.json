@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "tasks": [
+    {
+      "label": "Sync Schema",
+      "type": "shell",
+      "command": "npm run db:sync-schema",
+      "problemMatcher": []
+    },
+    {
+      "label": "Client",
+      "type": "shell",
+      "command": "nx serve frontend",
+      "problemMatcher": []
+    },
+    {
+      "label": "Server",
+      "type": "shell",
+      "command": "nx serve backend",
+      "dependsOn": ["Sync Schema"],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev",
+      "detail": "Run both 'frontend' and 'backend' in Dev mode",
+      "dependsOn": ["Client", "Server"],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    }
+  ]
+}

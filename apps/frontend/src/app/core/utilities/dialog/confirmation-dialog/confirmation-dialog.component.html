@@ -1,0 +1,26 @@
+<pal-dialog [titleText]="data.header" [hideClose]="true">
+   <div dialog-content>
+      <div class="confirmation-dialog-message">
+         {{ data.message }}
+      </div>
+   </div>
+   <div actionOverride>
+      <button
+         type="button"
+         mat-raised-button
+         color="primary"
+         (click)="onPrimaryActionClick()"
+      >
+         {{ primaryActionBtnText }}
+      </button>
+      <button
+         *ngIf="data.dialogType === dialogTypes.YesNo"
+         type="button"
+         mat-stroked-button
+         color="primary"
+         (click)="onNoClick()"
+      >
+         {{ secondaryActionBtnText }}
+      </button>
+   </div>
+</pal-dialog>

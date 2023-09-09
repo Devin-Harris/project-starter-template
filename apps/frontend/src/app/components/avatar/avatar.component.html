@@ -1,0 +1,7 @@
+<button mat-mini-fab [matMenuTriggerFor]="menu">SB</button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item routerLink="account-settings">Account Settings</button>
+  <button mat-menu-item routerLink="about-us">About Us</button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item disabled>Sign Out</button>
+</mat-menu>
