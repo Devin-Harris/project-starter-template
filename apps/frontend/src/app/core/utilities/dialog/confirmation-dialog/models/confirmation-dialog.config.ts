@@ -1,5 +1,5 @@
 import { MatDialogConfig } from '@angular/material/dialog';
-import { DialogSize } from '@core/utilities/dialog/enumerations/dialog-size.enum';
+import { DialogSize } from '../../enumerations/dialog-size.enum';
 
 export enum ConfirmationDialogType {
   Ok,

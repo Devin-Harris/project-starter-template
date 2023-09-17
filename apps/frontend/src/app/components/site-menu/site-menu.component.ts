@@ -47,7 +47,7 @@ export class SiteMenuComponent implements OnDestroy {
   }
 
   trackBy(_: number, item: MenuItem): string {
-    return `${item.routerLink}`;
+    return `${item.path}`;
   }
 
   onToggleMenuClicked() {

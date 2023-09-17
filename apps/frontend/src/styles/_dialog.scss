@@ -1,0 +1,191 @@
+@use 'breakpoints';
+@use 'variables';
+@use 'themes';
+
+@mixin modal-xl {
+  max-width: 1140px;
+  min-width: 1140px;
+
+  @include breakpoints.tablet {
+    max-width: 800px;
+    min-width: unset;
+  }
+
+  @include breakpoints.mobile {
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@mixin modal-large {
+  max-width: 800px;
+  min-width: 800px;
+
+  @include breakpoints.tablet {
+    max-width: 500px;
+    min-width: unset;
+  }
+
+  @include breakpoints.mobile {
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@mixin modal-medium {
+  max-width: 500px;
+  min-width: 500px;
+
+  @include breakpoints.mobile {
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@mixin modal-small {
+  max-width: 320px;
+
+  @include breakpoints.mobile {
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+// sizing utility classes
+.dialog-xl {
+  .mat-mdc-dialog-container {
+    @include modal-xl;
+
+    @include breakpoints.mobile {
+      ////@include dialog-mobile;
+    }
+  }
+}
+
+.dialog-lg {
+  .mat-mdc-dialog-container {
+    @include modal-large;
+
+    @include breakpoints.mobile {
+    }
+  }
+}
+
+.dialog-md {
+  .mat-mdc-dialog-container {
+    @include modal-medium;
+  }
+
+  @include breakpoints.mobile {
+  }
+}
+
+.dialog-mld {
+  .mat-mdc-dialog-container {
+    max-width: 600px;
+    min-width: 600px;
+  }
+}
+
+.dialog-sm {
+  .mat-mdc-dialog-container {
+    @include modal-small;
+  }
+}
+
+// global classes for extension dialogs
+.error-message-dialog {
+  .mat-mdc-dialog-container {
+    @include modal-medium;
+  }
+}
+
+.error-message-dialog,
+.information-dialog {
+  .mat-mdc-dialog-content {
+    color: themes.$text-secondary;
+    line-height: 1.45;
+    padding-bottom: 1em;
+    font-size: 0.875em;
+  }
+}
+
+.confirmation-message-heading,
+.error-message-heading {
+  color: themes.$text-primary;
+  font-weight: 500;
+  font-size: 1.25em;
+  margin-bottom: 1em;
+}
+
+.confirmation-dialog-message {
+  color: themes.$text-secondary;
+  line-height: 1.45;
+  font-size: 0.875em;
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-actions {
+  background: #f8f9fb;
+  margin-left: -1.5em;
+  margin-right: -1.5em;
+  padding: 0 1.5em;
+
+  &.space-between {
+    justify-content: space-between;
+  }
+
+  @include breakpoints.tablet {
+    padding: 1em;
+    flex-wrap: wrap;
+  }
+
+  @include breakpoints.mobile {
+    button,
+    .mat-mdc-button-base {
+      flex-grow: 1;
+      margin: 0 0.25em 0.5em 0.25em;
+    }
+
+    .flex-container {
+      flex-wrap: wrap;
+    }
+  }
+}
+
+.mat-mdc-dialog-container {
+  color: themes.$text-primary;
+  padding: 0 0 0.5em 0.5em;
+  margin-bottom: 0;
+
+  .mat-mdc-dialog-surface .mat-mdc-dialog-title {
+    border-bottom: 1px solid themes.$border;
+    display: flex;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0 auto;
+
+    h2 {
+      font-size: 20px;
+    }
+
+    .dialog-close-btn {
+      margin-left: auto;
+      margin-top: 0.1em;
+      padding: 12px;
+    }
+  }
+
+  .mat-mdc-dialog-actions {
+    margin-left: 0;
+    margin-right: 0;
+    justify-content: end;
+  }
+}
+
+.mat-mdc-input-element:disabled {
+  color: themes.$text-primary;
+}

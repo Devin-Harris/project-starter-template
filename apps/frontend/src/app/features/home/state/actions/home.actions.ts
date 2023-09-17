@@ -1,3 +1,4 @@
+import { createErrorActionPayload } from '@frontend/core/error-message/models/error-message-actions';
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 
 export const HomePageActions = createActionGroup({
@@ -15,6 +16,6 @@ export const HomeApiActions = createActionGroup({
       openedTicketsCount: number;
       closedTicketsCount: number;
     }>(),
-    'Get Ticket Counts Failure': props<{ error: any }>(),
+    'Get Ticket Counts Failure': createErrorActionPayload(),
   },
 });

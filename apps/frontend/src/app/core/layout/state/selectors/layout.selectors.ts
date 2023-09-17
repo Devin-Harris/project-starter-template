@@ -15,7 +15,7 @@ export const selectNavLinks = createSelector(
   (navs, url) => {
     return navs.map((nav) => ({
       ...nav,
-      isActive: nav.routerLink == url,
+      isActive: nav.path == url,
     }));
   }
 );

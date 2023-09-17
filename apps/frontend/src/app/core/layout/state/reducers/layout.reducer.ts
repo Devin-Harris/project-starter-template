@@ -4,7 +4,7 @@ import { LoadingState } from '@frontend/core/utilities/call-state/loading-state'
 import { createFeature, createReducer, on } from '@ngrx/store';
 import { BreakpointActions } from '../actions/breakpoint.actions';
 import { LayoutActions } from '../actions/layout.actions';
-import { MenuItem, PAL_NAV_LINKS } from '../models/nav-link.model';
+import { LAYOUT_NAV_LINKS, MenuItem } from '../models/nav-link.model';
 
 export const layoutFeatureKey = 'layout';
 
@@ -16,7 +16,7 @@ export interface State {
 }
 
 export const initialState: State = {
-  navLinks: PAL_NAV_LINKS,
+  navLinks: LAYOUT_NAV_LINKS,
   expanded: true,
   callState: LoadingState.Init,
   breakpoint: null,
@@ -40,7 +40,7 @@ export const reducer = createReducer(
   on(LayoutActions.loadLayoutsFailure, (state, action) => {
     return {
       ...state,
-      callState: action.error,
+      callState: { error: action.error },
     };
   }),
   on(LayoutActions.expandLayout, (state, action) => ({

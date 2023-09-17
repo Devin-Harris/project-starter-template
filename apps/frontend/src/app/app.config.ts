@@ -1,5 +1,10 @@
 import { provideHttpClient } from '@angular/common/http';
-import { ApplicationConfig, isDevMode } from '@angular/core';
+import {
+  ApplicationConfig,
+  importProvidersFrom,
+  isDevMode,
+} from '@angular/core';
+import { MatDialogModule } from '@angular/material/dialog';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { Providers } from '@frontend/core/providers';
@@ -13,20 +18,21 @@ import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
-   providers: [
-      provideRouter(routes),
-      provideStore(fromState.reducers),
-      provideEffects(...CoreEffects),
-      provideRouterStore({
-         serializer: PalRouterSerializer,
-         navigationActionTiming: NavigationActionTiming.PostActivation,
-      }),
-      provideStoreDevtools({
-         maxAge: 25,
-         logOnly: !isDevMode(),
-      }),
-      provideAnimations(),
-      provideHttpClient(),
-      [...Providers],
-   ],
+  providers: [
+    importProvidersFrom(MatDialogModule),
+    provideRouter(routes),
+    provideStore(fromState.reducers),
+    provideEffects(...CoreEffects),
+    provideRouterStore({
+      serializer: PalRouterSerializer,
+      navigationActionTiming: NavigationActionTiming.PostActivation,
+    }),
+    provideStoreDevtools({
+      maxAge: 25,
+      logOnly: !isDevMode(),
+    }),
+    provideAnimations(),
+    provideHttpClient(),
+    [...Providers],
+  ],
 };

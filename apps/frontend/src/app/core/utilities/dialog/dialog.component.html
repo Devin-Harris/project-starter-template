@@ -1,62 +1,65 @@
 <div class="dialog-wrapper">
-   <div class="flex-container" mat-dialog-title>
-      <ng-content select="[headerLogo]"></ng-content>
-      <h2 [innerHtml]="titleText"></h2>
-      <ng-content select="[headerActions]"></ng-content>
+  <div class="flex-container" mat-dialog-title>
+    <ng-content select="[headerLogo]"></ng-content>
+    <h2 [innerHtml]="titleText"></h2>
+    <ng-content select="[headerActions]"></ng-content>
+    <button
+      *ngIf="!hideClose"
+      class="dialog-close-btn"
+      type="button"
+      tabindex="-1"
+      (click)="onCloseClick()"
+      mat-icon-button
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="dialog-content-wrapper" [class.is-loading]="isLoading">
+    <mat-dialog-content
+      [class.dialog-no-scroll-content]="overrideContentScroll"
+      cdkScrollable
+    >
+      <ng-content select="[dialog-content]"></ng-content>
+    </mat-dialog-content>
+  </div>
+  <mat-dialog-actions class="nowrap-btns">
+    <ng-container class="action-override-wrapper">
+      <ng-content select="[actionOverride]"></ng-content>
+    </ng-container>
+    <ng-container>
       <button
-         *ngIf="!hideClose"
-         class="dialog-close-btn"
-         type="button"
-         tabindex="-1"
-         (click)="onCloseClick()"
-         mat-icon-button
-      >
-         <mat-icon>close</mat-icon>
-      </button>
-   </div>
-   <div class="dialog-content-wrapper" [class.is-loading]="isLoading">
-      <mat-dialog-content
-         [class.dialog-no-scroll-content]="overrideContentScroll"
-         cdkScrollable
-      >
-         <ng-content select="[dialog-content]"></ng-content>
-      </mat-dialog-content>
-   </div>
-   <mat-dialog-actions class="nowrap-btns">
-      <ng-container class="action-override-wrapper">
-         <ng-content select="[actionOverride]"></ng-content>
-      </ng-container>
-      <ng-container>
-         <button
-            *ngIf="tertiaryActionBtnText"
-            title="{{ tertiaryActionBtnText }}"
-            type="button"
-            class="tertiary-action-btn"
-            [innerHtml]="tertiaryActionBtnText"
-            [disabled]="tertiaryActionButtonDisabled"
-            (click)="onTertiaryActionBtnClick()"
-            mat-stroked-button
-         ></button>
-         <button
-            *ngIf="secondaryActionBtnText"
-            title="{{ secondaryActionBtnText }}"
-            type="button"
-            class="secondary-action-btn"
-            [innerHtml]="secondaryActionBtnText"
-            [disabled]="secondaryActionButtonDisabled"
-            (click)="onSecondaryActionBtnClick()"
-            mat-stroked-button
-         ></button>
-         <button
-            *ngIf="primaryActionBtnText"
-            title="{{ primaryActionBtnText }}"
-            type="submit"
-            class="primary-action-btn"
-            [innerHtml]="primaryActionBtnText"
-            [disabled]="primaryActionButtonDisabled"
-            (click)="onPrimaryActionBtnClick()"
-            mat-raised-button
-         ></button>
-      </ng-container>
-   </mat-dialog-actions>
+        *ngIf="tertiaryActionBtnText"
+        title="{{ tertiaryActionBtnText }}"
+        type="button"
+        class="tertiary-action-btn"
+        [innerHtml]="tertiaryActionBtnText"
+        [disabled]="tertiaryActionButtonDisabled"
+        (click)="onTertiaryActionBtnClick()"
+        color="secondary"
+        mat-stroked-button
+      ></button>
+      <button
+        *ngIf="secondaryActionBtnText"
+        title="{{ secondaryActionBtnText }}"
+        type="button"
+        class="secondary-action-btn"
+        [innerHtml]="secondaryActionBtnText"
+        [disabled]="secondaryActionButtonDisabled"
+        (click)="onSecondaryActionBtnClick()"
+        color="secondary"
+        mat-stroked-button
+      ></button>
+      <button
+        *ngIf="primaryActionBtnText"
+        title="{{ primaryActionBtnText }}"
+        type="submit"
+        class="primary-action-btn"
+        [innerHtml]="primaryActionBtnText"
+        [disabled]="primaryActionButtonDisabled"
+        (click)="onPrimaryActionBtnClick()"
+        color="primary"
+        mat-raised-button
+      ></button>
+    </ng-container>
+  </mat-dialog-actions>
 </div>
