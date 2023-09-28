@@ -1,5 +1,4 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { join } from 'path';
 import * as entities from './indices/entities-index';
 import * as migrations from './indices/migrations-index';
 
@@ -12,5 +11,5 @@ export const ormConfig: TypeOrmModuleOptions = {
   cli: {
     migrationsDir: 'src/migrations',
   },
-  entities: Object.values(entities)
+  entities: Object.values(entities),
 } as TypeOrmModuleOptions;

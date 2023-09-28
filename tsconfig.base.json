@@ -18,6 +18,7 @@
       "@shared": ["libs/shared/src/index.ts"],
       "@shared/dtos": ["libs/shared/src/dtos/index.ts"],
       "@shared/entities": ["libs/shared/src/entities/index.ts"],
+      "@shared/enums": ["libs/shared/src/enums/index.ts"],
       "@frontend/core": ["apps/frontend/src/app/core"],
       "@frontend/core/*": ["apps/frontend/src/app/core/*"],
       "@frontend/components": ["apps/frontend/src/app/components"],
