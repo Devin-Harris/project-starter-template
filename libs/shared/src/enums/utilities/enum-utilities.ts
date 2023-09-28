@@ -10,19 +10,27 @@ export function RootTableName<T extends EnumObject>(rootTableName: string) {
 
 export class EnumClass<T> {
   rootTableName: string | undefined;
-  reversedObject: { [x: number]: string } = {};
+  reversedObject: { [x: number]: { value: string; displayName?: string } } = {};
 }
 
-export type EnumObject = { [x: string]: number };
+export type EnumObject = {
+  [x: string]: number | { id: number; displayName?: string };
+};
 
 export function Enum<T extends EnumObject>(value: T): EnumConstructor<T> & T {
   const c = class extends EnumClass<T> {};
   c['reversedObject'] = {};
   const enumIds: Set<number> = new Set<number>();
   for (let key of Object.keys(value)) {
-    const id = value[key];
+    const enumField = value[key];
+    const id = typeof enumField === 'number' ? enumField : enumField.id;
+    const displayName =
+      typeof enumField === 'number' ? undefined : enumField.displayName;
     c[key] = id;
-    c['reversedObject'][id] = key;
+    c['reversedObject'][id] = {
+      value: key,
+      displayName: displayName ?? key,
+    };
     if (enumIds.has(id)) {
       throw new Error('Cannot create an enum with duplicate values');
     } else {

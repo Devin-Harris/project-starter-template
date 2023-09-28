@@ -37,12 +37,19 @@ export class EnumSyncService {
       const itemsToUpdate = await this.getItemsToUpdate(rootTableName, enumIds);
       this.itemsToSyncLog.push(
         ...itemsToUpdate
-          .filter((i) => enumClass.reversedObject[i.id] !== i.value)
+          .filter(
+            (i) =>
+              enumClass.reversedObject[i.id].value !== i.value ||
+              (enumClass.reversedObject[i.id].displayName ?? null) !==
+                (i.displayName ?? null)
+          )
           .map(
             (i): EnumTableSyncUpdateItem => ({
               rootTableName,
-              newValue: enumClass.reversedObject[i.id],
+              newValue: enumClass.reversedObject[i.id].value,
               currentValue: i.value,
+              newDisplayName: enumClass.reversedObject[i.id].displayName,
+              currentDisplayName: i.displayName,
               id: i.id,
               type: 'update',
             })
@@ -55,7 +62,8 @@ export class EnumSyncService {
           .map(
             (eId): EnumTableSyncInsertItem => ({
               rootTableName,
-              newValue: enumClass.reversedObject[eId],
+              newValue: enumClass.reversedObject[eId].value,
+              newDisplayName: enumClass.reversedObject[eId].displayName,
               id: eId,
               type: 'insert',
             })
@@ -68,6 +76,7 @@ export class EnumSyncService {
           (i): EnumTableSyncDeleteItem => ({
             rootTableName,
             currentValue: i.value,
+            currentDisplayName: i.displayName,
             id: i.id,
             type: 'delete',
           })
@@ -117,9 +126,9 @@ export class EnumSyncService {
     let sql = '';
     this.itemsToSyncLog.forEach((i) => {
       if (i.type === 'update') {
-        sql += `UPDATE ${i.rootTableName} SET value = '${i.newValue}' WHERE id = ${i.id};\n`;
+        sql += `UPDATE ${i.rootTableName} SET value = '${i.newValue}', displayName = '${i.newDisplayName}' WHERE id = ${i.id};\n`;
       } else if (i.type === 'insert') {
-        sql += `INSERT INTO ${i.rootTableName} (id, value) VALUES (${i.id}, '${i.newValue}');\n`;
+        sql += `INSERT INTO ${i.rootTableName} (id, value, displayName) VALUES (${i.id}, '${i.newValue}', '${i.newDisplayName}');\n`;
       } else if (i.type === 'delete') {
         sql += `DELETE FROM ${i.rootTableName} WHERE id = ${i.id};\n`;
       }
@@ -131,11 +140,11 @@ export class EnumSyncService {
     let sql = '';
     this.itemsToSyncLog.forEach((i) => {
       if (i.type === 'update') {
-        sql += `UPDATE ${i.rootTableName} SET value = '${i.currentValue}' WHERE id = ${i.id};\n`;
+        sql += `UPDATE ${i.rootTableName} SET value = '${i.currentValue}', displayName = '${i.currentDisplayName}' WHERE id = ${i.id};\n`;
       } else if (i.type === 'insert') {
         sql += `DELETE FROM ${i.rootTableName} WHERE id = ${i.id};\n`;
       } else if (i.type === 'delete') {
-        sql += `INSERT INTO ${i.rootTableName} (id, value) VALUES (${i.id}, '${i.currentValue}');\n`;
+        sql += `INSERT INTO ${i.rootTableName} (id, value, displayName) VALUES (${i.id}, '${i.currentValue}', '${i.currentDisplayName}');\n`;
       }
     });
     return sql;
@@ -159,11 +168,20 @@ export class EnumSyncService {
         }
 
         if (i.type === 'update') {
-          syncLog += `\t\t${i.id}: from ${i.currentValue} -> ${i.newValue}\n`;
+          const newDisplayNameString = i.newDisplayName
+            ? `(${i.newDisplayName})`
+            : '';
+          const currentDisplayNameString = i.currentDisplayName
+            ? ` (${i.currentDisplayName}) `
+            : '';
+          syncLog += `\t\t${i.id}: from ${i.currentValue}${currentDisplayNameString}-> ${i.newValue} ${newDisplayNameString}\n`;
         } else if (i.type === 'insert') {
-          syncLog += `\t\t${i.id}: ${i.newValue}\n`;
+          const displayNameString = i.newDisplayName
+            ? `(${i.newDisplayName})`
+            : '';
+          syncLog += `\t\t${i.id}: ${i.newValue} ${displayNameString}\n`;
         } else if (i.type === 'delete') {
-          syncLog += `\t\t${i.id}: ${i.currentValue}\n`;
+          syncLog += `\t\t${i.id}: ${i.currentValue} (${i.currentDisplayName})\n`;
         }
       });
       syncLog += '\n';
@@ -187,6 +205,11 @@ export class EnumSyncService {
         },
         {
           name: 'value',
+          type: 'varchar',
+          isNullable: false,
+        },
+        {
+          name: 'displayName',
           type: 'varchar',
           isNullable: false,
         },
