@@ -28,10 +28,9 @@ export class EnumSyncService {
 
   async onModuleInit() {
     for (let key of Object.keys(Enums)) {
-      const enumClass: EnumClass<EnumObject> = Enums[key];
+      const enumClass: EnumClass = Enums[key]
       const rootTableName = enumClass.rootTableName;
       await this.buildTableIfNotExists(rootTableName);
-
       const enumIds = this.getEnumIdsFromEnumClass(enumClass);
 
       const itemsToUpdate = await this.getItemsToUpdate(rootTableName, enumIds);
@@ -172,16 +171,19 @@ export class EnumSyncService {
             ? `(${i.newDisplayName})`
             : '';
           const currentDisplayNameString = i.currentDisplayName
-            ? ` (${i.currentDisplayName}) `
+            ? ` (${i.currentDisplayName})`
             : '';
-          syncLog += `\t\t${i.id}: from ${i.currentValue}${currentDisplayNameString}-> ${i.newValue} ${newDisplayNameString}\n`;
+          syncLog += `\t\t${i.id}: from ${i.currentValue}${currentDisplayNameString} -> ${i.newValue} ${newDisplayNameString}\n`;
         } else if (i.type === 'insert') {
           const displayNameString = i.newDisplayName
             ? `(${i.newDisplayName})`
             : '';
           syncLog += `\t\t${i.id}: ${i.newValue} ${displayNameString}\n`;
         } else if (i.type === 'delete') {
-          syncLog += `\t\t${i.id}: ${i.currentValue} (${i.currentDisplayName})\n`;
+          const currentDisplayNameString = i.currentDisplayName
+            ? ` (${i.currentDisplayName})`
+            : '';
+          syncLog += `\t\t${i.id}: ${i.currentValue}${currentDisplayNameString}\n`;
         }
       });
       syncLog += '\n';
@@ -241,7 +243,7 @@ export class EnumSyncService {
     );
   }
 
-  private getEnumIdsFromEnumClass(enumClass: EnumClass<EnumObject>): number[] {
+  private getEnumIdsFromEnumClass(enumClass: EnumClass): number[] {
     return Object.keys(enumClass.reversedObject).map((idStr) => +idStr);
   }
 }

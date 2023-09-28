@@ -1,8 +1,8 @@
-import { Enum, RootTableName } from './utilities/enum-utilities';
+import { Enum, EnumClass } from './utilities/enum-utilities';
 
-@RootTableName('HousingTypes')
-export class HousingTypes extends Enum({
-  House: 0,
-  Dorm: 1,
-  Apartment: 2,
-}) {}
+@Enum('HousingTypes')
+export class HousingTypes {
+ static House = 0
+ static Dorm = 1
+ static Apartment = 2
+}
