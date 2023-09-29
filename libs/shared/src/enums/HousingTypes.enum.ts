@@ -1,8 +1,8 @@
-import { Enum, EnumClass } from './utilities/enum-utilities';
+import { Enum, EnumValue } from './utilities/enum-utilities';
 
 @Enum('HousingTypes')
 export class HousingTypes {
- static House = 0
- static Dorm = 1
- static Apartment = 2
+    static House: EnumValue = 0
+    static Dorm: EnumValue = 1
+    static Apartment: EnumValue = { id: 3, displayName: 'Apartment Complex' }
 }
