@@ -51,3 +51,64 @@ or you can use the vscode task created:
 `CTRL+SHIFT+P` &rarr; `Tasks: Run Task` &rarr; `Server`
 _The server is also served alongside the client when you run the `Dev` task as well_
 _Using the task also automatically runs the `Sync Schema` task to recompile the entities/migrations before the backend is initialized. This allows any migrations that havent already ran to run on app start_
+
+## Enums
+
+Typescript enums have a few problems.
+
+Firstly you can attach many different kinds of values to the unique keys you provide:
+
+```
+enum HousingTypes {
+   House,
+   Apartment = 'Apartment',
+   Dorm = 1
+}
+```
+
+This of course is problematic when we try to use this enum on a column for a given entity. For example, say you have a Post Entity with a HousingType column. That column could not be represented by the value for the above enum because the values are both numbers and strings in that example.
+
+You may say just use the key name (so string column where "House" | "Apartment" | "Dorm" is the value), but what if the key name ever changes. Any post created with "Apartment" would have no way of knowing that the enum now calls that type "ApartmentComplex" and thus filtering/displaying logic from the UI could be broken.
+
+Because of this we are using a class based approach to enums:
+
+```
+@Enum('HousingTypes')
+export class HousingTypes extends EnumClass {
+    static House: EnumValue = 0
+    static Dorm: EnumValue = 1
+    static Apartment: EnumValue = { id: 3, displayName: 'Apartment Complex' }
+}
+```
+
+First the Enum decorator is a custom decorator that takes a string as a parameter. This is the name of the table that will be created for this enum. All enum tables will be created with a id (int), value (varchar), and displayname(varchar) column. This is also inforced by the EnumValue typing you see on each field within the class. The decorator also handles mapping the fields of the class in such a way that our enum-sync service can easily distinguish what updates need to be made to sync our current implementation of an enum with the version stored in a database.
+
+The enum-sync service on module init first loops over all enums exported from the shared enum folder. It queries each enums root table name for all the fields that currently exist in the table for the enum. If the current implementation has an field name change, display name change, removal of a field, or addition of a new field it will collect all that information and send a warning message in the console. The enum-sync controller also utilizes this service to automatically generate a migration to get the current implementation in sync. You can do this by making a POST request to the **/api/enum-sync** endpoint and it should automatically create the migration file and run the task for syncing the schema to the db (allows the app to auto run the migration as it rebuilds).
+
+Also note the static keyword on the enum fields. This is necessary for intellisense as we use the enum. Without it we would have to instantiate the class before trying to pull a fields value. So if we have some post `let p: Post = {...some post information, housingType: 1}` we could for instance compare the housingType on the post to do some logic like this: `if (p.housingType === HousingTypes.House) {...}` insetad of `if (p.housingType === new HousingTypes().House) {...}`
+
+With this approach we can also dynamically set a display name. This is useful because the field name on the class follows the javascript variable naming conventions/rules. If we want to display a user friendly version of the field name we we have to use a condition check on the frontend something like:
+
+```
+function getDisplayName(housingType: HousingTypes): string {
+   if (housingType === HousingTypes.Apartment) {
+      return 'Apartment Complex'
+   } else {
+      return Object.keys(HousingTypes).find(h => HousingTypes[h] === housingType)
+   }
+}
+```
+
+which is a bit verbose. Instead with this pattern we can simply utilize the displayname directly off the housingType value:
+
+```
+function getDisplayName(housingTypeValue: EnumValue): string {
+   const housingType: EnumLookup = HousingTypes.get(housingTypeValue);
+   return housingType.displayName
+}
+getDisplayName(3); // 'Apartment Complex'
+getDisplayName(HousingTypes.Apartment); // 'Apartment Complex'
+getDisplayName(HousingTypes.House); // 'House'
+```
+
+So in short when creating enums DO NOT use the built in **enum** operator. Instead follow the class pattern with the enum decorator, static fields and EnumClass extension to provide functionality to sync enums to database schema which ensures data integrity as enums evolve.

@@ -12,11 +12,6 @@ export class EnumSyncController {
     @Inject(EnumSyncService) private enumSyncService: EnumSyncService
   ) {}
 
-  @Get('/generate-enum-migration')
-  generateEnumSyncMigration() {
-    return `<pre>${this.enumSyncService.generateEnumSyncMigration()}</pre>`;
-  }
-
   @Post()
   createAndRunEnumSyncMigration() {
     this.enumSyncService.createEnumSyncMigration();

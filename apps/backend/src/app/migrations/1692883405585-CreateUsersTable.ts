@@ -17,8 +17,18 @@ export class CreateUsersTable1692883405585 implements MigrationInterface {
         { name: 'lastname', isNullable: false, type: 'varchar' },
         { name: 'firstname', isNullable: false, type: 'varchar' },
         { name: 'password', isNullable: false, type: 'varchar' },
-        { name: 'createDate', isNullable: false, type: 'datetime', default: 'CURRENT_TIMESTAMP' },
-        { name: 'updateDate', isNullable: false, type: 'datetime', default: 'CURRENT_TIMESTAMP' },
+        {
+          name: 'createDate',
+          isNullable: false,
+          type: 'datetime',
+          default: 'CURRENT_TIMESTAMP',
+        },
+        {
+          name: 'updateDate',
+          isNullable: false,
+          type: 'datetime',
+          default: 'CURRENT_TIMESTAMP',
+        },
       ],
     });
     await queryRunner.createTable(table, true, true, true);
@@ -28,4 +38,3 @@ export class CreateUsersTable1692883405585 implements MigrationInterface {
     await queryRunner.dropTable('users', true);
   }
 }
-

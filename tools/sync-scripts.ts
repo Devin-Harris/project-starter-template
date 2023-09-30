@@ -36,7 +36,7 @@ function createIndex(indexType: IndexType, outDir: string, searchPath: string) {
 
 const outDirBase = `apps/backend/src/app/database-connection/indices`;
 
-export function syncMigrations(dirname: string) {
+export function syncMigrations(dirname: string | null = null) {
   const migrationSearchPath = `${
     dirname ? dirname + '/' : ''
   }apps/backend/src/app/migrations/*.ts`;
@@ -45,7 +45,7 @@ export function syncMigrations(dirname: string) {
   createIndex('migrations', outDir, migrationSearchPath);
 }
 
-export function syncEntities(dirname: string) {
+export function syncEntities(dirname: string | null = null) {
   const entitySearchPath = `${
     dirname ? dirname + '/' : ''
   }libs/shared/src/entities/**/*.entity.ts`;

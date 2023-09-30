@@ -1,12 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as Enums from '@shared/enums';
-import {
-  EnumClass,
-  EnumObject,
-} from 'libs/shared/src/enums/utilities/enum-utilities';
+import { EnumClass } from 'libs/shared/src/enums/utilities/enum-utilities';
 import { createFile } from 'tools/storage.helper';
 import { syncMigrations } from 'tools/sync-scripts';
-import { DataSource, QueryRunner, Table, TableColumnOptions } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import {
   EnumTableResponseRow,
   EnumTableSyncDeleteItem,
@@ -22,18 +19,26 @@ export class EnumSyncService {
 
   private itemsToSyncLog: EnumTableSyncItemType[] = [];
 
+  private tablesToCreate: string[] = [];
+
   constructor(private dataSource: DataSource) {
     this.queryRunner = dataSource.createQueryRunner();
   }
 
   async onModuleInit() {
     for (let key of Object.keys(Enums)) {
-      const enumClass: EnumClass = Enums[key]
+      const enumClass: EnumClass = Enums[key];
       const rootTableName = enumClass.rootTableName;
-      await this.buildTableIfNotExists(rootTableName);
+      const hasTable = await this.queryRunner.hasTable(rootTableName);
+      if (!hasTable) {
+        this.tablesToCreate.push(rootTableName);
+      }
+
       const enumIds = this.getEnumIdsFromEnumClass(enumClass);
 
-      const itemsToUpdate = await this.getItemsToUpdate(rootTableName, enumIds);
+      const itemsToUpdate = hasTable
+        ? await this.getItemsToUpdate(rootTableName, enumIds)
+        : [];
       this.itemsToSyncLog.push(
         ...itemsToUpdate
           .filter(
@@ -69,7 +74,9 @@ export class EnumSyncService {
           )
       );
 
-      const itemsToDelete = await this.getItemsToDelete(rootTableName, enumIds);
+      const itemsToDelete = hasTable
+        ? await this.getItemsToDelete(rootTableName, enumIds)
+        : [];
       this.itemsToSyncLog.push(
         ...itemsToDelete.map(
           (i): EnumTableSyncDeleteItem => ({
@@ -87,38 +94,40 @@ export class EnumSyncService {
   }
 
   createEnumSyncMigration() {
-    this.generateEnumSyncMigration();
-    syncMigrations('');
+    const timestamp = Date.now();
+    const fileName = `${timestamp}-EnumSync`;
+    const fileText = this.generateEnumSyncMigration(timestamp);
+    if (fileText) {
+      createFile('apps/backend/src/app/migrations', `${fileName}.ts`, fileText);
+      syncMigrations();
+    } else {
+      throw new Error('Enum sync migration did not build properly.');
+    }
   }
 
-  generateEnumSyncMigration() {
+  private generateEnumSyncMigration(timestamp: number): string | null {
     if (this.itemsToSyncLog.length > 0) {
-      const timestamp = Date.now();
       const className = `EnumSync${timestamp}`;
-      const fileName = `${timestamp}-EnumSync`;
 
       const migrationFileText = `
-      import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+      import { MigrationInterface, QueryRunner, Table, TableColumnOptions } from 'typeorm';
 
       export class ${className} implements MigrationInterface {
          public async up(queryRunner: QueryRunner): Promise<void> {
+            ${this.enumTableCreateSql()}
             await queryRunner.query(\`${this.enumSyncSql()}\`);
          }
       
          public async down(queryRunner: QueryRunner): Promise<void> {
+            ${this.enumTableDropSql()}
             await queryRunner.query(\`${this.enumRevertSql()}\`);
          }
       }
     `;
 
-      createFile(
-        'apps/backend/src/app/migrations',
-        `${fileName}.ts`,
-        migrationFileText
-      );
-
       return migrationFileText;
     }
+    return null;
   }
 
   private enumSyncSql() {
@@ -149,16 +158,60 @@ export class EnumSyncService {
     return sql;
   }
 
+  private enumTableCreateSql() {
+    if (this.tablesToCreate.length === 0) return '';
+    return `
+   const columns: TableColumnOptions[] = [
+      {
+        name: 'id',
+        type: 'int',
+        isPrimary: true,
+        isNullable: false,
+        isGenerated: false,
+      },
+      {
+        name: 'value',
+        type: 'varchar',
+        isNullable: false,
+      },
+      {
+        name: 'displayName',
+        type: 'varchar',
+        isNullable: false,
+      },
+    ];
+    ${this.tablesToCreate.map((t) => {
+      return `
+      await queryRunner.createTable(new Table({ name: '${t}', columns }));\n
+      `;
+    })}
+    `;
+  }
+
+  private enumTableDropSql() {
+    if (this.tablesToCreate.length === 0) return '';
+    return `${this.tablesToCreate.map((t) => {
+      return `
+      await queryRunner.dropTable('${t}');\n
+      `;
+    })}`;
+  }
+
   logSyncStatus() {
+    let syncLog = '';
     if (this.itemsToSyncLog.length > 0) {
+      syncLog +=
+        '\n\nConsider writing migrations for the following enum changes:\n(Send POST to /api/enum-sync endpoint to auto generate and run migration)\n';
       let currRootTableName = '';
-      let syncLog =
-        '\n\nConsider writing migrations for the following enum changes:\n\n';
       let type: EnumTableSyncType | null = null;
       this.itemsToSyncLog.forEach((i) => {
         if (currRootTableName !== i.rootTableName) {
           currRootTableName = i.rootTableName;
-          syncLog += `${currRootTableName}\n`;
+          syncLog += `\n${currRootTableName}${
+            this.tablesToCreate.some((t) => t === currRootTableName)
+              ? ' (no table found)'
+              : ''
+          }\n`;
         }
 
         if (type !== i.type) {
@@ -187,38 +240,13 @@ export class EnumSyncService {
         }
       });
       syncLog += '\n';
+    }
 
+    if (syncLog) {
       Logger.error('ENUMS are out of sync with the Database');
       Logger.warn(syncLog);
-      return syncLog;
     }
-  }
-
-  private async buildTableIfNotExists(rootTableName: string) {
-    const hasTable = await this.queryRunner.hasTable(rootTableName);
-    if (!hasTable) {
-      const columns: TableColumnOptions[] = [
-        {
-          name: 'id',
-          type: 'int',
-          isPrimary: true,
-          isNullable: false,
-          isGenerated: false,
-        },
-        {
-          name: 'value',
-          type: 'varchar',
-          isNullable: false,
-        },
-        {
-          name: 'displayName',
-          type: 'varchar',
-          isNullable: false,
-        },
-      ];
-      const table = new Table({ name: rootTableName, columns });
-      await this.queryRunner.createTable(table);
-    }
+    return syncLog;
   }
 
   private async getItemsToUpdate(
