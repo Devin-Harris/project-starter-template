@@ -32,12 +32,22 @@ export function Enum(rootTableName: string) {
 export class EnumClass {
   [_rootTableNameKey]: string | undefined;
   [_reversedObjectKey]: {
-    [x: number]: EnumLookup;
+    [x: number]: Omit<EnumLookup, 'id'>;
   } = {};
 
-  static get(enumField: EnumValue) {
+  static get(enumField: EnumValue): EnumLookup {
     const id = typeof enumField === 'number' ? +enumField : +enumField.id;
-    return this[_reversedObjectKey][id];
+    const match: Omit<EnumLookup, 'id'> | null =
+      this && this[_reversedObjectKey] && this[_reversedObjectKey][id]
+        ? this[_reversedObjectKey][id]
+        : null;
+    if (!match) {
+      throw new Error(
+        `Could not find match with id ${id} on ${this[_rootTableNameKey]}`
+      );
+    }
+
+    return { ...this[_reversedObjectKey][id], id };
   }
 }
 
@@ -45,4 +55,4 @@ export type EnumObject = {
   [x: string]: EnumValue;
 };
 export type EnumValue = number | { id: number; displayName: string };
-export type EnumLookup = { value: string; displayName: string };
+export type EnumLookup = { value: string; displayName: string; id: number };
