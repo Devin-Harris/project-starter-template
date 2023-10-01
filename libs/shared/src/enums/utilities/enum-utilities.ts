@@ -37,16 +37,17 @@ export class EnumClass {
     [x: number]: Omit<EnumLookup, 'id'>;
   } = {};
 
-  static get(enumField: EnumValue): EnumLookup {
+  static get(enumField: EnumValue): EnumLookup | null {
     const id = typeof enumField === 'number' ? +enumField : +enumField.id;
     const match: Omit<EnumLookup, 'id'> | null =
       this && this[_reversedObjectKey] && this[_reversedObjectKey][id]
         ? this[_reversedObjectKey][id]
         : null;
     if (!match) {
-      throw new Error(
+      console.error(
         `Could not find match with id ${id} on ${this[_rootTableNameKey]}`
       );
+      return null;
     }
 
     return { ...this[_reversedObjectKey][id], id };

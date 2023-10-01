@@ -102,13 +102,14 @@ function getDisplayName(housingType: HousingTypes): string {
 which is a bit verbose. Instead with this pattern we can simply utilize the displayname directly off the housingType value:
 
 ```
-function getDisplayName(housingTypeValue: EnumValue): string {
-   const housingType: EnumLookup = HousingTypes.get(housingTypeValue);
-   return housingType.displayName
+function getDisplayName(housingTypeValue: EnumValue): string | null {
+   const housingType: EnumLookup | null = HousingTypes.get(housingTypeValue);
+   return housingType?.displayName ?? null
 }
 getDisplayName(3); // 'Apartment Complex'
 getDisplayName(HousingTypes.Apartment); // 'Apartment Complex'
 getDisplayName(HousingTypes.House); // 'House'
+getDisplayName(4); // null
 ```
 
 So in short when creating enums DO NOT use the built in **enum** operator. Instead follow the class pattern with the enum decorator, static fields and EnumClass extension to provide functionality to sync enums to database schema which ensures data integrity as enums evolve.
