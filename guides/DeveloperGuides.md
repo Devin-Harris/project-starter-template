@@ -46,6 +46,8 @@ Then the following global packages will be useful to have:
 `npm i -g nx`
 `npm i -g @nestjs/cli`
 
+Next `cd './Source Code'` and `npm i` to install all dependencies for frontend and backend apps before attempting to serve.
+
 ## Frontend Guides
 
 See the [frontend guides](./FrontendGuide.md) for more information
