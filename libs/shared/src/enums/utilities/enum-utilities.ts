@@ -2,7 +2,9 @@ export const _rootTableNameKey = 'rootTableName';
 export const _reversedObjectKey = 'reversedObject';
 
 export function Enum(rootTableName: string) {
-  return function <S extends new (...args: any[]) => {}>(constructor: S) {
+  return function <S extends new (...args: any[]) => EnumClass>(
+    constructor: S
+  ) {
     const cls = class extends constructor {};
     cls[_rootTableNameKey] = rootTableName;
     cls[_reversedObjectKey] = {};
